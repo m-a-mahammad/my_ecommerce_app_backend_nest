@@ -4,13 +4,15 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserResponseDto } from './dto/user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hash } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -64,6 +66,32 @@ export class UsersService {
     return {
       data: plainToInstance(UserResponseDto, registeredUser) as UserResponseDto,
       message: 'User registered successfully',
+    };
+  }
+
+  async loginUserService(
+    userData: LoginUserDto,
+  ): Promise<ResponseFormItf<UserResponseDto>> {
+    const { email, password } = userData;
+
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (typeof password === 'string') {
+      const isPasswordMatch = await compare(password, user.password);
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Invalid password');
+      }
+    }
+
+    return {
+      data: plainToInstance(UserResponseDto, user) as UserResponseDto,
+      message: 'User logged in successfully',
     };
   }
 }
