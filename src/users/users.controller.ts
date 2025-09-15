@@ -1,5 +1,14 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
+import { Request } from 'express';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -14,6 +23,16 @@ export class UsersController {
   @Get('id/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.usersService.getUserService(+id);
+    return user;
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  getCurrentUser(@Req() req: Request) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
     return user;
   }
 }
