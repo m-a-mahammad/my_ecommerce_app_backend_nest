@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -9,6 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -33,6 +37,16 @@ export class UsersController {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    return user;
+  }
+
+  @Post('register')
+  async registerUser(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.registerUserService(createUserDto);
+    if (!user) {
+      throw new BadRequestException('Failed to register user');
+    }
+
     return user;
   }
 }
