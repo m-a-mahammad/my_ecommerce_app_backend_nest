@@ -133,4 +133,30 @@ export class UsersService {
       message: 'User updated successfully',
     };
   }
+
+  async updateUserRoleService(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    userId: number,
+  ): Promise<ResponseFormItf<UserResponseDto>> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (id === userId) {
+      throw new BadRequestException('You cannot change your own role');
+    }
+
+    const { role } = updateUserDto;
+    if (role) {
+      user.role = role;
+    }
+
+    const updatedUser = await this.usersRepository.save(user);
+    return {
+      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      message: 'User role updated successfully',
+    };
+  }
 }

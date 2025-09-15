@@ -22,6 +22,9 @@ import { SetAuthCookieInterceptor } from 'src/interceptors/set-auth-cookie.inter
 import { RequestWithCookies } from 'src/interfaces/request-with-cookies.interface';
 import { isProduction } from 'src/utils/constants';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRole } from 'src/enums/user-role.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -110,5 +113,30 @@ export class UsersController {
       updateUserDto,
     );
     return user;
+  }
+
+  @Patch('id/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateUserRole(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
+  ) {
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (!updateUserDto.role)
+      throw new BadRequestException('Role field is required');
+
+    const updatedUser = await this.usersService.updateUserRoleService(
+      +id,
+      updateUserDto,
+      +userId,
+    );
+    return updatedUser;
   }
 }
