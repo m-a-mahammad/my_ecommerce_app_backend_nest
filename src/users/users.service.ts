@@ -15,6 +15,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { compare, hash } from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { join } from 'path';
+import { existsSync, unlink } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -157,6 +159,44 @@ export class UsersService {
     return {
       data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
       message: 'User role updated successfully',
+    };
+  }
+
+  async updateUserImageService(
+    updateUserDto: UpdateUserDto,
+    protocol: string,
+    host: string,
+    file: Express.Multer.File,
+    userId: number,
+  ): Promise<ResponseFormItf<UserResponseDto>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const updates = { ...updateUserDto };
+    if (file) {
+      const oldFileName = user.image.url?.split('/').pop();
+      if (oldFileName) {
+        const oldPath = join('uploads', oldFileName);
+        if (existsSync(oldPath)) {
+          unlink(oldPath, (err) => {
+            if (err) console.warn('Failed to delete image: ', err.message);
+            else console.log('Image deleted successfully 🧹');
+          });
+        }
+      }
+
+      updates.image = {
+        url: `${protocol}://${host}/uploads/${file.filename}`,
+      };
+    }
+
+    Object.assign(user, updates);
+    const updatedUser = await this.usersRepository.save(user);
+
+    return {
+      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      message: 'User image updated successfully',
     };
   }
 }

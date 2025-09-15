@@ -10,6 +10,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,6 +26,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRole } from 'src/enums/user-role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('users')
 export class UsersController {
@@ -136,6 +140,42 @@ export class UsersController {
       +id,
       updateUserDto,
       +userId,
+    );
+    return updatedUser;
+  }
+
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  @Patch('me/image')
+  @UseGuards(AuthGuard)
+  async updateUserImage(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = req.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User not found');
+    }
+    const host = req.headers.host || `localhost:${process.env.PORT}`;
+    const protocol = req.protocol;
+    const updatedUser = await this.usersService.updateUserImageService(
+      updateUserDto,
+      protocol,
+      host,
+      file,
+      Number(userId),
     );
     return updatedUser;
   }
