@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { ResponseFormItf } from 'src/interfaces/response-form.interface';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -18,5 +18,11 @@ export class UsersService {
     return {
       data: plainToInstance(UserResponseDto, users) as UserResponseDto[],
     };
+  }
+
+  async getUserService(id: number): Promise<ResponseFormItf<UserResponseDto>> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+    return { data: plainToInstance(UserResponseDto, user) as UserResponseDto };
   }
 }
