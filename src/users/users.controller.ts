@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -20,6 +21,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { SetAuthCookieInterceptor } from 'src/interceptors/set-auth-cookie.interceptor';
 import { RequestWithCookies } from 'src/interfaces/request-with-cookies.interface';
 import { isProduction } from 'src/utils/constants';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -92,5 +94,21 @@ export class UsersController {
     });
 
     return { message: 'User logged out successfully' };
+  }
+
+  @Patch('me')
+  @UseGuards(AuthGuard)
+  async updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const userId = req.userId;
+
+    if (!userId) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const user = await this.usersService.updateUserService(
+      +userId,
+      updateUserDto,
+    );
+    return user;
   }
 }

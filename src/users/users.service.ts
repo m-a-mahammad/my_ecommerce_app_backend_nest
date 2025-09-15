@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseFormItf } from 'src/interfaces/response-form.interface';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -13,6 +14,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { compare, hash } from 'bcryptjs';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -92,6 +94,43 @@ export class UsersService {
     return {
       data: plainToInstance(UserResponseDto, user) as UserResponseDto,
       message: 'User logged in successfully',
+    };
+  }
+
+  async updateUserService(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<ResponseFormItf<UserResponseDto>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let password = updateUserDto.password;
+    let currentPassword = updateUserDto.currentPassword;
+
+    if (password && currentPassword) {
+      if (!(await compare(currentPassword, user.password))) {
+        throw new UnauthorizedException('Password invailed');
+      } else {
+        const hashedPassword = await hash(password, 10);
+        password = hashedPassword;
+        currentPassword = password;
+      }
+    } else if (password && !currentPassword) {
+      throw new BadRequestException(`Current password field is required`);
+    }
+
+    if ('role' in updateUserDto) {
+      throw new ForbiddenException('You are not allowed to update your role');
+    }
+
+    Object.assign(user, updateUserDto);
+    const updatedUser = await this.usersRepository.save(user);
+    return {
+      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      message: 'User updated successfully',
     };
   }
 }
