@@ -6,11 +6,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import fs from 'fs';
 import path from 'path';
+import morgan from 'morgan';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
+
+  app.use(morgan('dev'));
 
   app.use(
     cors({
