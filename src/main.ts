@@ -7,11 +7,14 @@ import helmet from 'helmet';
 import fs from 'fs';
 import path from 'path';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
+
+  app.use(cookieParser());
 
   app.use(morgan('dev'));
 

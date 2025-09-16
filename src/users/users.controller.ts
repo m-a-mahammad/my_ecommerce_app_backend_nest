@@ -34,20 +34,24 @@ import { extname } from 'path';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get()
   async getAllUsers() {
     const users = await this.usersService.getAllUsersService();
     return users;
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('id/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.usersService.getUserService(+id);
     return user;
   }
 
-  @Get('me')
   @UseGuards(AuthGuard)
+  @Get('me')
   getCurrentUser(@Req() req: Request) {
     const user = req.user;
     if (!user) {
@@ -78,8 +82,8 @@ export class UsersController {
     return user;
   }
 
-  @Delete('logout')
   @UseGuards(AuthGuard)
+  @Delete('logout')
   logoutUser(
     @Req() req: RequestWithCookies,
     @Res({ passthrough: true }) res: Response,
@@ -103,8 +107,8 @@ export class UsersController {
     return { message: 'User logged out successfully' };
   }
 
-  @Patch('me')
   @UseGuards(AuthGuard)
+  @Patch('me')
   async updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.userId;
 
@@ -119,9 +123,9 @@ export class UsersController {
     return user;
   }
 
-  @Patch('id/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @Patch('id/:id')
   async updateUserRole(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -157,8 +161,8 @@ export class UsersController {
       }),
     }),
   )
-  @Patch('me/image')
   @UseGuards(AuthGuard)
+  @Patch('me/image')
   async updateUserImage(
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: Request,
@@ -180,9 +184,9 @@ export class UsersController {
     return updatedUser;
   }
 
-  @Delete('id/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @Delete('id/:id')
   async deleteUser(@Param('id') id: string) {
     const message = await this.usersService.deleteUserService(+id);
     return message;

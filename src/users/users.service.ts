@@ -128,7 +128,9 @@ export class UsersService {
       throw new ForbiddenException('You are not allowed to update your role');
     }
 
-    Object.assign(user, updateUserDto);
+    delete updateUserDto.password;
+    Object.assign(user, updateUserDto, password ? { password } : {});
+
     const updatedUser = await this.usersRepository.save(user);
     return {
       data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
