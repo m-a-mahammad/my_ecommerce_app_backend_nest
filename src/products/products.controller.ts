@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -11,5 +12,12 @@ export class ProductsController {
     const createdProduct =
       await this.productsService.createProductService(createProductDto);
     return createdProduct;
+  }
+
+  @Get()
+  async getAllProducts(@Query() paginationDto: PaginationDto) {
+    const products =
+      await this.productsService.getAllProductsService(paginationDto);
+    return products;
   }
 }
