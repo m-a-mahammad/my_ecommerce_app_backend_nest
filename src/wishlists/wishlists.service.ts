@@ -99,4 +99,31 @@ export class WishlistsService {
       message: 'Product added to wishlist',
     };
   }
+
+  async deleteProductFromWishlistService(
+    user: UserResponseDto,
+    productId: number,
+  ): Promise<ResponseFormItf<WishlistItemDto>> {
+    const userId = user.id;
+    if (!userId) throw new NotFoundException('User ID not found');
+
+    const wishlist = await this.wishlistRepository.findOneBy({
+      user: { id: userId },
+    });
+    if (!wishlist) throw new NotFoundException('Wishlist not found');
+
+    const item = await this.wishlistItemRepository.findOneBy({
+      wishlist: { id: wishlist.id },
+      product: { id: productId },
+    });
+    if (!item) throw new NotFoundException('Product not found in wishlist');
+
+    const deletedItem = await this.wishlistItemRepository.remove(item);
+    return {
+      data: plainToInstance(WishlistItemDto, deletedItem, {
+        excludeExtraneousValues: true,
+      }) as WishlistItemDto,
+      message: 'Product removed from wishlist',
+    };
+  }
 }

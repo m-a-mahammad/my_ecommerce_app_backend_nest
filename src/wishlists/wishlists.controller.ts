@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -49,5 +51,24 @@ export class WishlistsController {
     }
 
     return item;
+  }
+
+  @Delete('id/:productId')
+  @UseGuards(AuthGuard)
+  async deleteProductFromWishlist(
+    @Req() req: Request,
+    @Param('productId') productId: string,
+  ) {
+    const user = req.user;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const deletedItem =
+      await this.wishlistsService.deleteProductFromWishlistService(
+        user,
+        +productId,
+      );
+
+    return deletedItem;
   }
 }
