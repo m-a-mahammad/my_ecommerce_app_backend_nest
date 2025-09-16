@@ -1,8 +1,11 @@
+import { Cart } from 'src/carts/entities/cart.entity';
 import { UserRole } from 'src/enums/user-role.enum';
+import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -35,6 +38,12 @@ export class User {
 
   @Column(() => Image, { prefix: false })
   image: Image;
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
+
+  @OneToOne(() => Wishlist, (wishlist) => wishlist.user)
+  wishlist: Wishlist;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

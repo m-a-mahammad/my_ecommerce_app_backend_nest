@@ -14,14 +14,13 @@ import { CartsService } from './carts.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Request } from 'express';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Controller('carts')
 export class CartsController {
   constructor(private readonly cartService: CartsService) {}
 
-  @Get('me')
   @UseGuards(AuthGuard)
+  @Get('me')
   async getCart(@Req() req: Request) {
     const user = req.user;
 
@@ -33,11 +32,11 @@ export class CartsController {
     return cart;
   }
 
-  @Post('create-or-update')
   @UseGuards(AuthGuard)
+  @Post('create-or-update')
   async addOrUpdateCartItem(
     @Req() req: Request,
-    @Body() createOrUpdateCartDto: CreateCartDto | UpdateCartDto,
+    @Body() createCartDto: CreateCartDto,
   ) {
     const user = req.user;
     if (!user) {
@@ -45,13 +44,13 @@ export class CartsController {
     }
     const cartItem = await this.cartService.addOrUpdateCartItemService(
       user,
-      createOrUpdateCartDto,
+      createCartDto,
     );
     return cartItem;
   }
 
-  @Delete('id/:productId')
   @UseGuards(AuthGuard)
+  @Delete('id/:productId')
   async deleteCartItem(
     @Req() req: Request,
     @Param('productId') productId: string,

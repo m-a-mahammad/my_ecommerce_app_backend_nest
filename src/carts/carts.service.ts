@@ -9,7 +9,6 @@ import { plainToInstance } from 'class-transformer';
 import { Product } from 'src/products/entities/product.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { CartItemDto } from './dto/cart-item.dto';
 
 @Injectable()
@@ -50,59 +49,50 @@ export class CartsService {
 
   async addOrUpdateCartItemService(
     user: UserResponseDto,
-    createOrUpdateCartDto: CreateCartDto | UpdateCartDto,
+    createCartDto: CreateCartDto,
   ): Promise<ResponseFormItf<CartItemDto>> {
-    const { productId, quantity } = createOrUpdateCartDto;
+    const { productId, quantity } = createCartDto;
 
-    const cart = await this.cartRepository.findOne({
+    let cart = await this.cartRepository.findOne({
       where: { user: { id: user.id } },
+      relations: ['items', 'items.product'],
     });
 
-    const product = await this.productRepository.findOneBy({
-      id: productId,
-    });
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
-
-    const cartItem = await this.cartItemRepository.findOneBy({
-      product: { id: productId },
-    });
-
-    if (!cartItem) throw new NotFoundException('Cart item not found');
+    const product = await this.productRepository.findOneBy({ id: productId });
+    if (!product) throw new NotFoundException('Product not found');
 
     if (!cart) {
-      const cart = this.cartRepository.create({
+      cart = this.cartRepository.create({
         user,
         items: [],
         totalPrice: 0,
       });
       await this.cartRepository.save(cart);
-      return { data: cartItem, message: 'Cart created successfully' };
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.product.id === product.id,
-    );
+    let cartItem = cart.items.find((item) => item.product.id === productId);
 
-    if (!existingItem) {
-      const cartItem = new CartItem();
-      cartItem.product = product;
-      cartItem.quantity = Number(quantity) || 1;
-      cartItem.cart = cart;
+    if (!cartItem) {
+      cartItem = this.cartItemRepository.create({
+        product,
+        quantity: quantity || 1,
+      });
       cart.items.push(cartItem);
     } else {
-      existingItem.quantity = Number(quantity) || 1;
-      await this.cartItemRepository.save(existingItem);
+      cartItem.quantity = quantity || 1;
     }
 
-    const totalItemsPrice = this.calculateTotalPrice(cart);
-    cart.totalPrice = totalItemsPrice;
+    await this.cartItemRepository.save(cartItem);
+
+    cart.totalPrice = this.calculateTotalPrice(cart);
     await this.cartRepository.save(cart);
-    return {
-      data: plainToInstance(CartItemDto, existingItem) as CartItemDto,
-      message: 'Cart updated successfully',
-    };
+
+    await this.cartRepository.findOne({
+      where: { id: cart.id },
+      relations: ['items', 'items.product'],
+    });
+
+    return { data: cartItem };
   }
 
   async deleteCartItemService(
@@ -116,13 +106,16 @@ export class CartsService {
       throw new NotFoundException('Cart not found');
     }
 
-    const deletedItem = await this.cartItemRepository.delete({
-      cart: { id: cart.id },
-      product: { id: productId },
+    const deletedItem = await this.cartItemRepository.findOne({
+      where: { cart: { id: cart.id }, product: { id: productId } },
     });
+
+    if (!deletedItem) throw new NotFoundException('Cart item not found');
+
+    await this.cartItemRepository.delete(deletedItem.id);
     return {
       data: plainToInstance(CartItemDto, deletedItem) as CartItemDto,
-      message: 'Item removed from cart',
+      message: 'Item deleted from cart',
     };
   }
 

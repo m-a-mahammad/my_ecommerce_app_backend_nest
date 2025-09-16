@@ -1,4 +1,5 @@
 import slugify from 'slugify';
+import { CartItem } from 'src/carts/entities/cart-item.entity';
 import { ColumnNumericTransformer } from 'src/common/transformers/column-numeric.transformer';
 import {
   BeforeInsert,
@@ -6,6 +7,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -49,6 +51,9 @@ export class Product {
 
   @Column(() => Image, { prefix: false })
   image: Image;
+
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
+  cartItems: CartItem[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
