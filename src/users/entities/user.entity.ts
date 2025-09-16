@@ -2,6 +2,7 @@ import { UserRole } from 'src/enums/user-role.enum';
 import {
   Column,
   CreateDateColumn,
+  Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -11,6 +12,7 @@ class Image {
   url: string;
 }
 
+@Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
