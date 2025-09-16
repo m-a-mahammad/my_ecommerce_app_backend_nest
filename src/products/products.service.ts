@@ -94,4 +94,11 @@ export class ProductsService {
       message: `product ${id} has updated successfully`,
     };
   }
+
+  async deleteProductByIdService(
+    id: number,
+  ): Promise<ResponseFormItf<ProductResponseDto>> {
+    await this.productsRepository.delete(id);
+    return { message: `product ${id} has been deleted successfully` };
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -52,5 +53,12 @@ export class ProductsController {
       updateProductDto,
     );
     return updatedProduct;
+  }
+
+  @Delete(':id')
+  async deleteProductById(@Param('id') id: string) {
+    const deletedProduct =
+      await this.productsService.deleteProductByIdService(+id);
+    return deletedProduct;
   }
 }
