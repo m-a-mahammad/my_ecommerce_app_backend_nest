@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ProductsModule } from './products/products.module';
+import { WishlistsModule } from './wishlists/wishlists.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ProductsModule } from './products/products.module';
     }),
     UsersModule,
     ProductsModule,
+    WishlistsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
