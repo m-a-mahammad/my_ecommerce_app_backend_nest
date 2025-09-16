@@ -52,6 +52,7 @@ export class CartsService {
     createCartDto: CreateCartDto,
   ): Promise<ResponseFormItf<CartItemDto>> {
     const { productId, quantity } = createCartDto;
+    let isNew: boolean = false;
 
     let cart = await this.cartRepository.findOne({
       where: { user: { id: user.id } },
@@ -68,12 +69,14 @@ export class CartsService {
         totalPrice: 0,
       });
       await this.cartRepository.save(cart);
+      isNew = true;
     }
 
     let cartItem = cart.items.find((item) => item.product.id === productId);
 
     if (!cartItem) {
       cartItem = this.cartItemRepository.create({
+        cart,
         product,
         quantity: quantity || 1,
       });
@@ -87,12 +90,14 @@ export class CartsService {
     cart.totalPrice = this.calculateTotalPrice(cart);
     await this.cartRepository.save(cart);
 
-    await this.cartRepository.findOne({
-      where: { id: cart.id },
-      relations: ['items', 'items.product'],
-    });
-
-    return { data: cartItem };
+    return {
+      data: plainToInstance(CartItemDto, cartItem, {
+        excludeExtraneousValues: true,
+      }) as CartItemDto,
+      message: isNew
+        ? 'Cart created successfully'
+        : 'Cart updated successfully',
+    };
   }
 
   async deleteCartItemService(
