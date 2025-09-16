@@ -23,7 +23,7 @@ export class WishlistsService {
     @InjectRepository(WishlistItem)
     private wishlistItemRepository: Repository<WishlistItem>,
     @InjectRepository(Product)
-    private productRepository: Repository<Product>,
+    private productsRepository: Repository<Product>,
   ) {}
 
   async getOrCreateWishlistByUserIdService(
@@ -73,7 +73,7 @@ export class WishlistsService {
     });
     if (!wishlist) throw new NotFoundException('Wishlist not found');
 
-    const product = await this.productRepository.findOne({
+    const product = await this.productsRepository.findOne({
       where: { id: createWishlistDto.productId },
     });
     if (!product) throw new NotFoundException('Product not found');
