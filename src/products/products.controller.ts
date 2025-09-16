@@ -26,4 +26,10 @@ export class ProductsController {
     const product = await this.productsService.getProductByIdService(+id);
     return product;
   }
+
+  @Get('slug/:slug')
+  async getProductBySlug(@Param('slug') slug: string) {
+    const product = await this.productsService.getProductBySlugService(slug);
+    return product;
+  }
 }

@@ -58,4 +58,15 @@ export class ProductsService {
       data: plainToInstance(ProductResponseDto, product) as ProductResponseDto,
     };
   }
+
+  async getProductBySlugService(
+    slug: string,
+  ): Promise<ResponseFormItf<ProductResponseDto>> {
+    const product = await this.productsRepository.findOne({ where: { slug } });
+    if (!product)
+      throw new NotFoundException(`Product with slug name ${slug} not found`);
+    return {
+      data: plainToInstance(ProductResponseDto, product) as ProductResponseDto,
+    };
+  }
 }
