@@ -53,7 +53,7 @@ export class PaymentsService {
     const totalEGP = this.cartsService.calculateTotalPrice(cart);
     const amount = Number(totalEGP * 100);
     const MethodId = payment_method_id;
-    const currency = payment_currency;
+    const currency = payment_currency || 'EGP';
     const billingData = payment_billing_data;
 
     if (amount < 100)
@@ -89,7 +89,7 @@ export class PaymentsService {
 
     createdPayment.user = userEntity;
     createdPayment.amount = amount;
-    createdPayment.currency = currency || 'EGP';
+    createdPayment.currency = currency;
     createdPayment.method = MethodId;
     createdPayment.client_secret = client_secret;
     createdPayment.intention_id = id;
