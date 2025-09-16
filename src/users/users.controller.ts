@@ -19,7 +19,7 @@ import { Request, Response } from 'express';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { SetAuthCookieInterceptor } from 'src/interceptors/set-auth-cookie.interceptor';
+import { SetAuthCookieInterceptor } from 'src/common/interceptors/set-auth-cookie.interceptor';
 import { RequestWithCookies } from 'src/interfaces/request-with-cookies.interface';
 import { isProduction } from 'src/utils/constants';
 import { UpdateUserDto } from './dto/update-user.dto';

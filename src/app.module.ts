@@ -8,6 +8,7 @@ import { join } from 'path';
 import { ProductsModule } from './products/products.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { CartsModule } from './carts/carts.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CartsModule } from './carts/carts.module';
     ProductsModule,
     WishlistsModule,
     CartsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

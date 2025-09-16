@@ -1,10 +1,12 @@
 import { Cart } from 'src/carts/entities/cart.entity';
 import { UserRole } from 'src/enums/user-role.enum';
+import { Payment } from 'src/payments/entities/payment.entity';
 import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -44,6 +46,9 @@ export class User {
 
   @OneToOne(() => Wishlist, (wishlist) => wishlist.user)
   wishlist: Wishlist;
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
