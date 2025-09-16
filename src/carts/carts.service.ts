@@ -105,6 +105,27 @@ export class CartsService {
     };
   }
 
+  async deleteCartItemService(
+    userId: number,
+    productId: number,
+  ): Promise<ResponseFormItf<CartItemDto>> {
+    const cart = await this.cartRepository.findOne({
+      where: { user: { id: userId } },
+    });
+    if (!cart) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    const deletedItem = await this.cartItemRepository.delete({
+      cart: { id: cart.id },
+      product: { id: productId },
+    });
+    return {
+      data: plainToInstance(CartItemDto, deletedItem) as CartItemDto,
+      message: 'Item removed from cart',
+    };
+  }
+
   calculateTotalPrice(cart: CartResponseDto): number {
     return cart.items.reduce((acc, item) => {
       return acc + item.product.price * item.quantity;

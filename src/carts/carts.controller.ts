@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
+  Param,
   Post,
   Req,
   UnauthorizedException,
@@ -46,5 +48,18 @@ export class CartsController {
       createOrUpdateCartDto,
     );
     return cartItem;
+  }
+
+  @Delete('id/:productId')
+  @UseGuards(AuthGuard)
+  async deleteCartItem(
+    @Req() req: Request,
+    @Param('productId') productId: string,
+  ) {
+    const userId = req.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in');
+    }
+    return this.cartService.deleteCartItemService(+userId, +productId);
   }
 }
