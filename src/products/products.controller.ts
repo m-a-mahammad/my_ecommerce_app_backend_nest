@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PaginationDto } from './dto/pagination.dto';
@@ -19,5 +19,11 @@ export class ProductsController {
     const products =
       await this.productsService.getAllProductsService(paginationDto);
     return products;
+  }
+
+  @Get('id/:id')
+  async getProductById(@Param('id') id: string) {
+    const product = await this.productsService.getProductByIdService(+id);
+    return product;
   }
 }
