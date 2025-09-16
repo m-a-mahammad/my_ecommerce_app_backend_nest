@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -31,5 +40,17 @@ export class ProductsController {
   async getProductBySlug(@Param('slug') slug: string) {
     const product = await this.productsService.getProductBySlugService(slug);
     return product;
+  }
+
+  @Patch(':id')
+  async updateProductById(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    const updatedProduct = await this.productsService.updateProductByIdService(
+      +id,
+      updateProductDto,
+    );
+    return updatedProduct;
   }
 }
