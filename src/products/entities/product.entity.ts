@@ -59,7 +59,7 @@ export class Product {
   @BeforeInsert()
   @BeforeUpdate()
   generateSlug() {
-    if (!this.slug && this.name) {
+    if (this.name) {
       this.slug = slugify(this.name, { lower: true }) as string;
     }
   }
