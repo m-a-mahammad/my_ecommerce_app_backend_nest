@@ -179,4 +179,12 @@ export class UsersController {
     );
     return updatedUser;
   }
+
+  @Delete('id/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async deleteUser(@Param('id') id: string) {
+    const message = await this.usersService.deleteUserService(+id);
+    return message;
+  }
 }

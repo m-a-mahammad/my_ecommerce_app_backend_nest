@@ -199,4 +199,18 @@ export class UsersService {
       message: 'User image updated successfully',
     };
   }
+
+  async deleteUserService(
+    id: number,
+  ): Promise<ResponseFormItf<UserResponseDto>> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const deletedUser = await this.usersRepository.remove(user);
+    return {
+      data: plainToInstance(UserResponseDto, deletedUser) as UserResponseDto,
+      message: 'User deleted successfully',
+    };
+  }
 }
