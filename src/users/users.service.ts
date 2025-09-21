@@ -28,14 +28,14 @@ export class UsersService {
   async getAllUsersService(): Promise<ResponseFormItf<UserResponseDto[]>> {
     const users = await this.usersRepository.find();
     return {
-      data: plainToInstance(UserResponseDto, users) as UserResponseDto[],
+      data: plainToInstance(UserResponseDto, users),
     };
   }
 
   async getUserService(id: number): Promise<ResponseFormItf<UserResponseDto>> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    return { data: plainToInstance(UserResponseDto, user) as UserResponseDto };
+    return { data: plainToInstance(UserResponseDto, user) };
   }
 
   async registerUserService(
@@ -68,7 +68,7 @@ export class UsersService {
     const registeredUser = await this.usersRepository.save(user);
 
     return {
-      data: plainToInstance(UserResponseDto, registeredUser) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, registeredUser),
       message: 'User registered successfully',
     };
   }
@@ -94,7 +94,7 @@ export class UsersService {
     }
 
     return {
-      data: plainToInstance(UserResponseDto, user) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, user),
       message: 'User logged in successfully',
     };
   }
@@ -133,7 +133,7 @@ export class UsersService {
 
     const updatedUser = await this.usersRepository.save(user);
     return {
-      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, updatedUser),
       message: 'User updated successfully',
     };
   }
@@ -159,7 +159,7 @@ export class UsersService {
 
     const updatedUser = await this.usersRepository.save(user);
     return {
-      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, updatedUser),
       message: 'User role updated successfully',
     };
   }
@@ -197,7 +197,7 @@ export class UsersService {
     const updatedUser = await this.usersRepository.save(user);
 
     return {
-      data: plainToInstance(UserResponseDto, updatedUser) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, updatedUser),
       message: 'User image updated successfully',
     };
   }
@@ -211,7 +211,7 @@ export class UsersService {
     }
     const deletedUser = await this.usersRepository.remove(user);
     return {
-      data: plainToInstance(UserResponseDto, deletedUser) as UserResponseDto,
+      data: plainToInstance(UserResponseDto, deletedUser),
       message: 'User deleted successfully',
     };
   }

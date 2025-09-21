@@ -23,10 +23,7 @@ export class ProductsService {
     const product = this.productsRepository.create(createProductDto);
     const createdProduct = await this.productsRepository.save(product);
     return {
-      data: plainToInstance(
-        ProductResponseDto,
-        createdProduct,
-      ) as ProductResponseDto,
+      data: plainToInstance(ProductResponseDto, createdProduct),
       message: 'product created successfully',
     };
   }
@@ -42,10 +39,7 @@ export class ProductsService {
       take: limit,
     });
     return {
-      data: plainToInstance(
-        ProductResponseDto,
-        product,
-      ) as ProductResponseDto[],
+      data: plainToInstance(ProductResponseDto, product),
     };
   }
 
@@ -56,7 +50,7 @@ export class ProductsService {
     if (!product)
       throw new NotFoundException(`Product with id ${id} not found`);
     return {
-      data: plainToInstance(ProductResponseDto, product) as ProductResponseDto,
+      data: plainToInstance(ProductResponseDto, product),
     };
   }
 
@@ -67,7 +61,7 @@ export class ProductsService {
     if (!product)
       throw new NotFoundException(`Product with slug name ${slug} not found`);
     return {
-      data: plainToInstance(ProductResponseDto, product) as ProductResponseDto,
+      data: plainToInstance(ProductResponseDto, product),
     };
   }
 
@@ -87,10 +81,7 @@ export class ProductsService {
     const updatedProduct = await this.productsRepository.save(product);
 
     return {
-      data: plainToInstance(
-        ProductResponseDto,
-        updatedProduct,
-      ) as ProductResponseDto,
+      data: plainToInstance(ProductResponseDto, updatedProduct),
       message: `product ${id} has updated successfully`,
     };
   }

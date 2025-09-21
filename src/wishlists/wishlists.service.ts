@@ -49,7 +49,7 @@ export class WishlistsService {
       return {
         data: plainToInstance(WishlistResponseDto, createdWishlist, {
           excludeExtraneousValues: true,
-        }) as WishlistResponseDto,
+        }),
         message: 'Wishlist created successfully',
       };
     }
@@ -57,7 +57,7 @@ export class WishlistsService {
     return {
       data: plainToInstance(WishlistResponseDto, wishlist, {
         excludeExtraneousValues: true,
-      }) as WishlistResponseDto,
+      }),
     };
   }
 
@@ -95,7 +95,7 @@ export class WishlistsService {
     return {
       data: plainToInstance(WishlistItemDto, createdItem, {
         excludeExtraneousValues: true,
-      }) as WishlistItemDto,
+      }),
       message: 'Product added to wishlist',
     };
   }
@@ -122,7 +122,7 @@ export class WishlistsService {
     return {
       data: plainToInstance(WishlistItemDto, deletedItem, {
         excludeExtraneousValues: true,
-      }) as WishlistItemDto,
+      }),
       message: 'Product removed from wishlist',
     };
   }

@@ -36,7 +36,7 @@ export class CartsService {
       });
       await this.cartRepository.save(createdCart);
       return {
-        data: plainToInstance(CartResponseDto, createdCart) as CartResponseDto,
+        data: plainToInstance(CartResponseDto, createdCart),
       };
     } else {
       this.calculateTotalPrice(cart);
@@ -44,7 +44,7 @@ export class CartsService {
     }
     const totalItemsPrice = this.calculateTotalPrice(cart);
     cart.totalPrice = totalItemsPrice;
-    return { data: plainToInstance(CartResponseDto, cart) as CartResponseDto };
+    return { data: plainToInstance(CartResponseDto, cart) };
   }
 
   async addOrUpdateCartItemService(
@@ -93,7 +93,7 @@ export class CartsService {
     return {
       data: plainToInstance(CartItemDto, cartItem, {
         excludeExtraneousValues: true,
-      }) as CartItemDto,
+      }),
       message: isNew
         ? 'Cart created successfully'
         : 'Cart updated successfully',
@@ -119,7 +119,7 @@ export class CartsService {
 
     await this.cartItemRepository.delete(deletedItem.id);
     return {
-      data: plainToInstance(CartItemDto, deletedItem) as CartItemDto,
+      data: plainToInstance(CartItemDto, deletedItem),
       message: 'Item deleted from cart',
     };
   }
