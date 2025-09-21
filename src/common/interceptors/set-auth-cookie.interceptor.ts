@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import {
   CallHandler,
   ExecutionContext,
@@ -13,6 +14,7 @@ import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
 @Injectable()
 export class SetAuthCookieInterceptor implements NestInterceptor {
+  constructor(private readonly configService: ConfigService) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -20,7 +22,7 @@ export class SetAuthCookieInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap((data: ResponseFormItf<UserResponseDto>) => {
         if (data?.data?.id) {
-          const jwtSecret = process.env.JWT_SECRET;
+          const jwtSecret = this.configService.get<string>('JWT_SECRET');
           if (!jwtSecret)
             throw new Error(
               'JWT_SECRET is not defined in environment variables',

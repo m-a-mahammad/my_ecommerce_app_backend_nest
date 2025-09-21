@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import {
   CanActivate,
   ExecutionContext,
@@ -12,7 +13,10 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<RequestWithCookies>();
@@ -23,7 +27,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const jwtSecret = process.env.JWT_SECRET;
+      const jwtSecret = this.configService.get<string>('JWT_SECRET');
       if (!jwtSecret)
         throw new Error('JWT_SECRET is not defined in environment variables');
       const payload = verify(token, jwtSecret) as JwtPayload;
