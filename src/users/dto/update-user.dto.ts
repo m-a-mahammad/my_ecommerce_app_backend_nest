@@ -32,5 +32,5 @@ export class UpdateUserDto extends PartialType(
 
   @IsOptional()
   @IsEnum(UserRole)
-  role?: string;
+  role?: UserRole;
 }
