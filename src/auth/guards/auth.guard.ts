@@ -19,8 +19,8 @@ export class AuthGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest<RequestWithCookies>();
-    const token = request.cookies?.token;
+    const httpRequest = ctx.getRequest<RequestWithCookies>();
+    const token = httpRequest.cookies?.token;
 
     if (!token) {
       throw new UnauthorizedException('Unauthorized user');
@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
       const payload = verify(token, jwtSecret) as JwtPayload;
 
       if (typeof payload === 'object' && 'userId' in payload) {
-        request.userId = payload.userId;
+        httpRequest.userId = payload.userId;
       }
 
       const user = await this.usersService.getUserService(
@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
         );
       }
 
-      request.user = user.data;
+      httpRequest.user = user.data;
     } catch (error) {
       const logger = new Logger(AuthGuard.name);
       logger.error('JWT verification failed', error);

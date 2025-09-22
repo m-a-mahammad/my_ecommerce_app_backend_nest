@@ -17,21 +17,21 @@ export class SetAuthCookieInterceptor implements NestInterceptor {
   constructor(private readonly configService: ConfigService) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
-    const response = ctx.getResponse<Response>();
+    const httpResponse = ctx.getResponse<Response>();
 
     return next.handle().pipe(
-      tap((data: ResponseFormItf<UserResponseDto>) => {
-        if (data?.data?.id) {
+      tap((response: ResponseFormItf<UserResponseDto>) => {
+        if (response?.data?.id) {
           const jwtSecret = this.configService.get<string>('JWT_SECRET');
           if (!jwtSecret)
             throw new Error(
               'JWT_SECRET is not defined in environment variables',
             );
-          const token = sign({ userId: data.data.id }, jwtSecret, {
+          const token = sign({ userId: response.data.id }, jwtSecret, {
             expiresIn: '7d',
           });
 
-          response.cookie('token', token, authCookieOptions);
+          httpResponse.cookie('token', token, authCookieOptions);
         }
       }),
     );
